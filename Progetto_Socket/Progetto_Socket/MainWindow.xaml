@@ -17,7 +17,8 @@
         <Button x:Name="btnSend" Content="Invia" HorizontalAlignment="Left" Margin="472,342,0,0" VerticalAlignment="Top" Width="185" Click="btnSend_Click"/>
         <Label x:Name="lblRx" Content="" VerticalContentAlignment="Top" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="605,10,0,0" VerticalAlignment="Top" Width="185" Height="32" FontSize="10"/>
         <Button x:Name="btnClear" Content="Cancella chat" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="246,367,0,0" VerticalAlignment="Top" Width="85" Height="26" BorderBrush="Red" Background="#FFFF6E6E" Click="btnClear_Click"/>
-        <Button x:Name="btnAdvanced" Content="Vai alla versione avanzata" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="780" Height="32" Click="btnAdvanced_Click"/>
+        <Button x:Name="btnAdvanced" Content="Vai alla versione avanzata" HorizontalAlignment="Left" Margin="400,10,0,0" VerticalAlignment="Top" Width="390" Height="32" Click="btnAdvanced_Click"/>
+        <Button x:Name="btnUsa" Content="Usa questa versione" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" Width="390" Height="32" Click="btnUsa_Click"/>
 
     </Grid>
 </Window>

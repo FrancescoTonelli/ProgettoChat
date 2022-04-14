@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Windows.Threading;
 
 namespace Progetto_Socket
 {
@@ -21,12 +24,14 @@ namespace Progetto_Socket
     public partial class Versione2 : Window
     {
         List<Contatto> Rubrica;
-        int indiceInterlocutore;
+        int indiceDestinatario = -1;
+        Socket socket;
         public Versione2()
         {
             try
             {
                 InitializeComponent();
+                InizializzazioneComunicazioni();
                 LeggiRubrica();
                 AggiornaListaContatti();
             }catch (Exception ex)
@@ -34,6 +39,22 @@ namespace Progetto_Socket
                 MessageBox.Show(ex.Message);
             }
         }
+
+        //inizializzazione della socket
+        private void InizializzazioneComunicazioni()
+        {
+            try
+            {
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                IPAddress local = IPAddress.Any;
+                IPEndPoint local_endpoint = new IPEndPoint(local.MapToIPv4(), 65000);
+                socket.Bind(local_endpoint);
+            }catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //Legge e memorizza tutti i contatti e relativi messaggi
         private void LeggiRubrica()
         {
@@ -48,11 +69,10 @@ namespace Progetto_Socket
                         string nome = "";
                         string ip = "";
                         int porta = 0;
-                        List<Messaggio> lista;
+                        List<Messaggio> lista = new List<Messaggio>();
                         string[] lettura = riga.Split('¢');
                         for (int i = 0; i < lettura.Length; i++)
                         {
-                            lista = new List<Messaggio>();
                             if (i == 0)
                             {
                                 nome = lettura[i];
@@ -72,7 +92,7 @@ namespace Progetto_Socket
                                 lista.Add(messaggioAppoggio);
                             }
                         }
-                        Contatto nuovo = new Contatto();
+                        Contatto nuovo = new Contatto(nome, ip, porta, lista);
                         Rubrica.Add(nuovo);
                     }
                 }
@@ -154,7 +174,7 @@ namespace Progetto_Socket
                 MessageBox.Show(ex.Message);
             }
         }
-
+        //cancella contatto selezionato
         private void CancellaContatto(int i)
         {
             try
@@ -169,12 +189,95 @@ namespace Progetto_Socket
 
         private void lstContatti_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CambiaDestinatario();
+            try
+            {
+                if (lstContatti.SelectedIndex != -1)
+                {
+                    CambiaDestinatario();
+                }
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
-
+        //quando viene selezionato un contatto ne stampa la chat
         private void CambiaDestinatario()
         {
+            try
+            {
+                indiceDestinatario = lstContatti.SelectedIndex;
+                lstMex.Items.Clear();
+                lblDest.Content = "Stai parlando con " + Rubrica[lstContatti.SelectedIndex].ToList();
+                foreach (Messaggio m in Rubrica[lstContatti.SelectedIndex].GetChat())
+                {
+                    lstMex.Items.Add(m.ToList());
+                }
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
 
+        private void btnDltChat_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CancellaChat();
+                SalvaRubrica();
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        //pulizia chat relativa al destinatario in questione
+        private void CancellaChat()
+        {
+            try
+            {
+                if(indiceDestinatario != -1)
+                {
+                    Rubrica[indiceDestinatario].CancellaChat();
+                    lstMex.Items.Clear();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void btnSend_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                InviaMessaggio(txtMex.Text);
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        //invio dei messaggi
+        private void InviaMessaggio(string messaggio)
+        {
+            try
+            {
+                if(indiceDestinatario != -1)
+                {
+                    IPAddress remote = IPAddress.Parse(Rubrica[indiceDestinatario].GetIP());
+                    IPEndPoint remote_endpoint = new IPEndPoint(remote, Rubrica[indiceDestinatario].GetPort());
+                    byte[] mex = Encoding.UTF8.GetBytes(messaggio);
+                    socket.SendTo(mex, remote_endpoint);
+                    lstMex.Items.Add("Me: " + Encoding.Default.GetString(mex));
+                    Messaggio m = new Messaggio("Me", messaggio);
+                    Rubrica[indiceDestinatario].AggiungiMessaggio(m);
+                    SalvaRubrica();
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

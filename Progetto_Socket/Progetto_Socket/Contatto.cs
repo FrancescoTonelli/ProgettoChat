@@ -16,6 +16,9 @@ namespace Progetto_Socket
         private List<Messaggio> _chat;
         public Contatto()
         {
+            _nome = "";
+            _ip = "";
+            _port = 0;
             _chat = new List<Messaggio>();
         }
 
@@ -71,5 +74,29 @@ namespace Progetto_Socket
             return _nome;
         }
 
+        public string GetIP()
+        {
+            return _ip;
+        }
+
+        public int GetPort()
+        {
+            return _port;
+        }
+
+        public List<Messaggio> GetChat()
+        {
+            return _chat;
+        }
+
+        public void AggiungiMessaggio(Messaggio m)
+        {
+            _chat.Add(m);
+        }
+
+        public void CancellaChat()
+        {
+            _chat.Clear();
+        }
     }
 }
