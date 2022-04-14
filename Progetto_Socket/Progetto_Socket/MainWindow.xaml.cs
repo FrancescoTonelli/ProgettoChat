@@ -129,5 +129,12 @@ namespace Progetto_Socket
             //pulisco la listbox con la chat
             lstBox.Items.Clear();
         }
+
+        private void btnAdvanced_Click(object sender, RoutedEventArgs e)
+        {
+            Versione2 window = new Versione2();
+            window.Show();
+            this.Close();
+        }
     }
 }

@@ -29,3 +29,5 @@ C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Pr
 C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Progetto_Socket.csproj.CoreCompileInputs.cache
 C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Progetto_Socket.exe
 C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Progetto_Socket.pdb
+C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Versione2.g.cs
+C:\Users\wfaff\Desktop\ProgettoChat\Progetto_Socket\Progetto_Socket\obj\Debug\Versione2.baml
