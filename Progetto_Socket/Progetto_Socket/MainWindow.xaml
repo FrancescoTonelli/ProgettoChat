@@ -16,6 +16,7 @@
         <TextBox x:Name="txtMex" HorizontalAlignment="Left" Height="64" Margin="472,234,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="185"/>
         <Button x:Name="btnSend" Content="Invia" HorizontalAlignment="Left" Margin="472,342,0,0" VerticalAlignment="Top" Width="185" Click="btnSend_Click"/>
         <Label x:Name="lblRx" Content="" HorizontalAlignment="Left" Margin="56,16,0,0" VerticalAlignment="Top" Width="185"/>
+        <Button x:Name="btnClear" Content="Cancella chat" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="246,367,0,0" VerticalAlignment="Top" Width="85" Height="26" BorderBrush="Red" Background="#FFFF6E6E" Click="btnClear_Click"/>
 
     </Grid>
 </Window>
