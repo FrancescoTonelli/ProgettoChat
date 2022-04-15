@@ -309,6 +309,40 @@ namespace Progetto_Socket
                 throw ex;
             }
         }
+
+        //metodo per inviare i messaggi a tutti i contatti
+        private void InviaBroadcast(string messaggio)
+        {
+            try
+            {
+                for (int i = 0; i < Rubrica.Count; i++) 
+                {
+                    IPAddress remote = IPAddress.Parse(Rubrica[i].GetIP());
+                    IPEndPoint remote_endpoint = new IPEndPoint(remote, Rubrica[i].GetPort());
+                    byte[] mex = Encoding.UTF8.GetBytes(messaggio);
+                    lock (semaforoModificaRubrica)
+                    {
+                        socket.SendTo(mex, remote_endpoint);
+                        if(i == indiceDestinatario)
+                        {
+                            lstMex.Items.Add("Me: " + Encoding.Default.GetString(mex));
+                        }
+                        Messaggio m = new Messaggio("Me", messaggio);
+                        Rubrica[i].AggiungiMessaggio(m);
+                    }
+                }
+
+                lock (semaforoModificaRubrica)
+                {
+                    SalvaRubrica();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         //metodo per il thread di ricezione
         private void Ricezione()
         {
@@ -354,7 +388,7 @@ namespace Progetto_Socket
                 throw ex;
             }
         }
-
+        //Alla chiusura della scheda viene interrotto il thread di ricezione
         private void Chiusura(object sender, CancelEventArgs e)
         {
             try
@@ -363,6 +397,17 @@ namespace Progetto_Socket
             }catch (Exception)
             {
 
+            }
+        }
+
+        private void btnBroadcast_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                InviaBroadcast(txtMex.Text);
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
     }

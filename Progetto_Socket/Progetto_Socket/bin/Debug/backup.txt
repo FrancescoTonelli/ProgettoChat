@@ -1,2 +1,2 @@
-Loopback¢127.0.0.1¢65000¢Me□Uei¢Loopback□Uei
-Cam¢192.168.1.5¢65000¢Me□Ciao¢Cam□Ciao
+Loopback¢127.0.0.1¢65000¢Me□Uei¢Loopback□Uei¢Me□Prova¢Loopback□Prova¢Me□Broadcast¢Loopback□Broadcast
+Cam¢192.168.1.5¢65000¢Me□Ciao¢Cam□Ciao¢Me□Broadcast

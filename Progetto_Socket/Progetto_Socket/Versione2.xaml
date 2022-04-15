@@ -27,6 +27,7 @@
         <Button x:Name="btnAdd" Content="Aggiungi" HorizontalAlignment="Left" Margin="63,340,0,0" VerticalAlignment="Top" Width="189" Click="btnAdd_Click"/>
         <Button x:Name="btnDlt" Content="Elimina" HorizontalAlignment="Left" Margin="260,212,0,0" VerticalAlignment="Top" Width="78" Click="btnDlt_Click"/>
         <Button x:Name="btnDltChat" Content="Elimina questa chat" HorizontalAlignment="Left" Margin="613,351,0,0" VerticalAlignment="Top" Width="120" Click="btnDltChat_Click"/>
+        <Button x:Name="btnBroadcast" Content="Invia a tutti" HorizontalAlignment="Left" Margin="458,351,0,0" VerticalAlignment="Top" Width="152" Click="btnBroadcast_Click"/>
 
     </Grid>
 </Window>
