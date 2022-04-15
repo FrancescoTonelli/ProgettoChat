@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Windows.Threading;
+using System.Threading;
 
 namespace Progetto_Socket
 {
@@ -26,6 +26,7 @@ namespace Progetto_Socket
         List<Contatto> Rubrica;
         int indiceDestinatario = -1;
         Socket socket;
+        object semaforoModificaRubrica = new object();
         public Versione2()
         {
             try
@@ -34,6 +35,10 @@ namespace Progetto_Socket
                 InizializzazioneComunicazioni();
                 LeggiRubrica();
                 AggiornaListaContatti();
+
+                Thread ricevitore = new Thread(new ThreadStart(Ricezione));
+                ricevitore.Start();
+
             }catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
@@ -96,6 +101,8 @@ namespace Progetto_Socket
                         Rubrica.Add(nuovo);
                     }
                 }
+
+
             }
             catch (Exception ex)
             {
@@ -106,10 +113,13 @@ namespace Progetto_Socket
         //aggiorna la listbox con i contatti
         private void AggiornaListaContatti()
         {
-            lstContatti.Items.Clear();
-            foreach(Contatto c in Rubrica)
+            lock (semaforoModificaRubrica)
             {
-                lstContatti.Items.Add(c.ToList());
+                lstContatti.Items.Clear();
+                foreach (Contatto c in Rubrica)
+                {
+                    lstContatti.Items.Add(c.ToList());
+                }
             }
         }
 
@@ -118,11 +128,14 @@ namespace Progetto_Socket
         {
             try
             {
-                using (StreamWriter sw = new StreamWriter("backup.txt"))
+                lock (semaforoModificaRubrica)
                 {
-                    for (int i = 0; i < Rubrica.Count; i++)
+                    using (StreamWriter sw = new StreamWriter("backup.txt"))
                     {
-                        sw.WriteLine(Rubrica[i].ToString());
+                        for (int i = 0; i < Rubrica.Count; i++)
+                        {
+                            sw.WriteLine(Rubrica[i].ToString());
+                        }
                     }
                 }
             }catch (Exception ex)
@@ -139,7 +152,10 @@ namespace Progetto_Socket
                 string ip = txtIP.Text;
                 int port = int.Parse(txtPorta.Text);
                 Contatto c = new Contatto(nome, ip, port);
-                Rubrica.Add(c);
+                lock (semaforoModificaRubrica)
+                {
+                    Rubrica.Add(c);
+                }
             }
             catch (Exception ex)
             {
@@ -179,8 +195,11 @@ namespace Progetto_Socket
         {
             try
             {
-                lstContatti.SelectedIndex = -1;
-                Rubrica.RemoveAt(i);
+                lock (semaforoModificaRubrica)
+                {
+                    lstContatti.SelectedIndex = -1;
+                    Rubrica.RemoveAt(i);
+                }
             }catch(Exception ex)
             {
                 throw ex;
@@ -205,12 +224,15 @@ namespace Progetto_Socket
         {
             try
             {
-                indiceDestinatario = lstContatti.SelectedIndex;
-                lstMex.Items.Clear();
-                lblDest.Content = "Stai parlando con " + Rubrica[lstContatti.SelectedIndex].ToList();
-                foreach (Messaggio m in Rubrica[lstContatti.SelectedIndex].GetChat())
+                lock (semaforoModificaRubrica)
                 {
-                    lstMex.Items.Add(m.ToList());
+                    indiceDestinatario = lstContatti.SelectedIndex;
+                    lstMex.Items.Clear();
+                    lblDest.Content = "Stai parlando con " + Rubrica[indiceDestinatario].ToList();
+                    foreach (Messaggio m in Rubrica[indiceDestinatario].GetChat())
+                    {
+                        lstMex.Items.Add(m.ToList());
+                    }
                 }
             }catch(Exception ex)
             {
@@ -236,8 +258,11 @@ namespace Progetto_Socket
             {
                 if(indiceDestinatario != -1)
                 {
-                    Rubrica[indiceDestinatario].CancellaChat();
-                    lstMex.Items.Clear();
+                    lock (semaforoModificaRubrica)
+                    {
+                        Rubrica[indiceDestinatario].CancellaChat();
+                        lstMex.Items.Clear();
+                    }
                 }
             }
             catch (Exception ex)
@@ -267,14 +292,61 @@ namespace Progetto_Socket
                     IPAddress remote = IPAddress.Parse(Rubrica[indiceDestinatario].GetIP());
                     IPEndPoint remote_endpoint = new IPEndPoint(remote, Rubrica[indiceDestinatario].GetPort());
                     byte[] mex = Encoding.UTF8.GetBytes(messaggio);
-                    socket.SendTo(mex, remote_endpoint);
-                    lstMex.Items.Add("Me: " + Encoding.Default.GetString(mex));
-                    Messaggio m = new Messaggio("Me", messaggio);
-                    Rubrica[indiceDestinatario].AggiungiMessaggio(m);
-                    SalvaRubrica();
+                    lock (semaforoModificaRubrica)
+                    {
+                        socket.SendTo(mex, remote_endpoint);
+                        lstMex.Items.Add("Me: " + Encoding.Default.GetString(mex));
+                        Messaggio m = new Messaggio("Me", messaggio);
+                        Rubrica[indiceDestinatario].AggiungiMessaggio(m);
+                        SalvaRubrica();
+                    }
                 }
             }
             catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+        //metodo per il thread di ricezione
+        private void Ricezione()
+        {
+            try
+            {
+                while (true)
+                {
+                    int nBytes;
+                    if ((nBytes = socket.Available) > 0)
+                    {
+                        byte[] buffer = new byte[nBytes];
+                        EndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                        nBytes = socket.ReceiveFrom(buffer, ref remoteEndPoint);
+                        string from = ((IPEndPoint)remoteEndPoint).Address.ToString();
+                        string messaggio = Encoding.UTF8.GetString(buffer, 0, nBytes);
+                        for (int i = 0; i < Rubrica.Count; i++)
+                        {
+                            if (Rubrica[i].GetIP() == from)
+                            {
+                                lock (semaforoModificaRubrica)
+                                {
+                                    Messaggio m = new Messaggio(from, messaggio);
+                                    Rubrica[i].AggiungiMessaggio(m);
+                                    if (i == indiceDestinatario)
+                                    {
+                                        this.Dispatcher.BeginInvoke(new Action(() =>
+                                        {
+                                            lstMex.Items.Add(m.ToList());
+                                        }));
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                    }
+
+                }
+            }
+            catch (Exception ex)
             {
                 throw ex;
             }
