@@ -15,6 +15,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Progetto_Socket
 {
@@ -27,6 +28,7 @@ namespace Progetto_Socket
         int indiceDestinatario = -1;
         Socket socket;
         object semaforoModificaRubrica = new object();
+        Thread ricevitore;
         public Versione2()
         {
             try
@@ -36,7 +38,7 @@ namespace Progetto_Socket
                 LeggiRubrica();
                 AggiornaListaContatti();
 
-                Thread ricevitore = new Thread(new ThreadStart(Ricezione));
+                ricevitore = new Thread(new ThreadStart(Ricezione));
                 ricevitore.Start();
 
             }catch (Exception ex)
@@ -350,6 +352,17 @@ namespace Progetto_Socket
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void Chiusura(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                ricevitore.Abort();
+            }catch (Exception)
+            {
+
             }
         }
     }

@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Progetto_Socket"
         mc:Ignorable="d"
-        Title="Versione2" Height="450" Width="800">
+        Title="Versione2" Height="450" Width="800"
+        Closing="Chiusura"
+        >
     <Grid>
         <Rectangle HorizontalAlignment="Left" Height="366" Margin="400,16,0,0" Stroke="Black" VerticalAlignment="Top" Width="390"/>
 
@@ -24,7 +26,7 @@
         <TextBox x:Name="txtNome" HorizontalAlignment="Left" Margin="107,252,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Height="20"/>
         <Button x:Name="btnAdd" Content="Aggiungi" HorizontalAlignment="Left" Margin="63,340,0,0" VerticalAlignment="Top" Width="189" Click="btnAdd_Click"/>
         <Button x:Name="btnDlt" Content="Elimina" HorizontalAlignment="Left" Margin="260,212,0,0" VerticalAlignment="Top" Width="78" Click="btnDlt_Click"/>
-        <Button x:Name="btnDltChat" Content="Elimina" HorizontalAlignment="Left" Margin="655,351,0,0" VerticalAlignment="Top" Width="78" Click="btnDltChat_Click"/>
+        <Button x:Name="btnDltChat" Content="Elimina questa chat" HorizontalAlignment="Left" Margin="613,351,0,0" VerticalAlignment="Top" Width="120" Click="btnDltChat_Click"/>
 
     </Grid>
 </Window>
