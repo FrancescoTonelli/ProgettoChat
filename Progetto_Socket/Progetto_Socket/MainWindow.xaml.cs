@@ -32,6 +32,8 @@ namespace Progetto_Socket
             try
             {
                 InitializeComponent();
+                btnSend.IsEnabled = false;
+                btnClear.IsEnabled = false;
             }
             catch (Exception ex)
             {
@@ -117,6 +119,8 @@ namespace Progetto_Socket
                 Inizializza();
                 btnAdvanced.Visibility = Visibility.Hidden;
                 btnUsa.Visibility = Visibility.Hidden;
+                btnClear.IsEnabled = true;
+                btnSend.IsEnabled = true;
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
