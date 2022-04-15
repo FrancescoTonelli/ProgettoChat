@@ -328,7 +328,7 @@ namespace Progetto_Socket
                             {
                                 lock (semaforoModificaRubrica)
                                 {
-                                    Messaggio m = new Messaggio(from, messaggio);
+                                    Messaggio m = new Messaggio(Rubrica[i].ToList(), messaggio);
                                     Rubrica[i].AggiungiMessaggio(m);
                                     if (i == indiceDestinatario)
                                     {
@@ -337,6 +337,7 @@ namespace Progetto_Socket
                                             lstMex.Items.Add(m.ToList());
                                         }));
                                     }
+                                    SalvaRubrica();
                                 }
                                 break;
                             }
